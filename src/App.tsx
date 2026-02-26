@@ -292,34 +292,99 @@ export default function App() {
         </div>
       </section>
 
-      {/* ═══════════════ Quick Links Grid ═══════════════ */}
-      <section className="max-w-[1200px] mx-auto px-4 -mt-8 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-0 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
-          {QUICK_LINKS.map((link, i) => (
-            <a
-              key={i}
-              href={link.href}
-              className="flex items-center gap-3 px-6 py-5 border-r border-b border-gray-100 last:border-r-0 hover:bg-[#FDF0D5] transition-colors group"
-            >
-              <span className="text-2xl">{link.icon}</span>
-              <span className="text-sm font-medium text-gray-700 group-hover:text-[#780000] transition-colors">
-                {link.label}
-              </span>
-            </a>
-          ))}
-          {/* CTA Card */}
+      {/* ═══════════════ Quick Links Cards (okkorea50 Style) ═══════════════ */}
+      <section className="max-w-[1240px] mx-auto px-4 -mt-12 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          {/* Card 1: Global Program */}
+          <div className="relative group rounded-[2rem] bg-white p-8 shadow-xl border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:border-ukp/30">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full blur-3xl -z-10 transition-transform group-hover:scale-150 opacity-40"></div>
+            <div className="relative z-10 h-full flex flex-col">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-ukp">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2 2.5 2.5 0 012.5 2.5v.658a2.5 2.5 0 00.088.658l.963 2.408M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 brand-font">글로벌 교류</h3>
+              </div>
+              <div className="space-y-4 flex-grow">
+                <a href="#exchange" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-gray-50 transition-colors">
+                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-ukp">해외교류 프로그램</span>
+                  <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
+                </a>
+                <a href="#student" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-gray-50 transition-colors">
+                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-ukp">교환학생 안내</span>
+                  <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Language Center */}
+          <div className="relative group rounded-[2rem] bg-[#F8FAFC] p-8 shadow-xl border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:border-[#003049]/30">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-3xl -z-10 transition-transform group-hover:scale-150 opacity-40"></div>
+            <div className="relative z-10 h-full flex flex-col">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-[#003049]">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 11.37 9.198 14.73 5.63 18.5" /></svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 brand-font">K-어학센터</h3>
+              </div>
+              <div className="space-y-4 flex-grow">
+                <a href="#kit-korean" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-white transition-colors">
+                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-[#003049]">UKP 한국어학당</span>
+                  <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
+                </a>
+                <a href="#training" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-white transition-colors">
+                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-[#003049]">단기 어학연수</span>
+                  <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Career & Admission */}
+          <div className="relative group rounded-[2rem] bg-[#FFF7ED] p-8 shadow-xl border border-orange-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:border-orange-200">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-orange-100 rounded-full blur-3xl -z-10 transition-transform group-hover:scale-150 opacity-40"></div>
+            <div className="relative z-10 h-full flex flex-col">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 brand-font">진로 및 입학</h3>
+              </div>
+              <div className="space-y-4 flex-grow">
+                <a href="#field-learning" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-white transition-colors">
+                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-orange-600">글로벌 현장학습</span>
+                  <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
+                </a>
+                <a href="#admission" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-white transition-colors">
+                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-orange-600">유학생 입학상담</span>
+                  <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 4: Emphasized Admission Info */}
           <a
             href="#admission-info"
-            className="col-span-2 md:col-span-1 md:row-span-2 bg-[#780000] text-white flex items-center justify-center p-8 hover:bg-[#9A0000] transition-colors group"
+            className="bento-item rounded-[2rem] bg-gradient-to-br from-[#780000] to-[#9A0000] p-8 shadow-2xl border border-white/10 relative overflow-hidden group transition-all duration-500 hover:scale-[1.05] hover:shadow-[0_20px_50px_rgba(120,0,0,0.4)] flex flex-col justify-center items-center text-center"
           >
-            <div className="text-center">
-              <svg className="w-10 h-10 mx-auto mb-3 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-              </svg>
-              <p className="text-sm font-semibold leading-relaxed">
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl transition-all duration-700 group-hover:scale-150 group-hover:bg-white/20"></div>
+            <div className="relative z-10">
+              <div className="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center text-white mb-6 mx-auto backdrop-blur-md group-hover:rotate-12 transition-transform">
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                </svg>
+              </div>
+              <p className="text-white font-bold text-lg leading-tight mb-2 brand-font">
                 Admission information<br />for international students
               </p>
-              <span className="inline-block mt-2 text-xs opacity-70 group-hover:opacity-100 transition">→ 자세히 보기</span>
+              <p className="text-white/70 text-sm mb-6">입학 정보 및 유학 가이드</p>
+              <span className="inline-flex items-center gap-2 px-6 py-2 bg-white text-ukp rounded-full text-xs font-bold shadow-lg transform group-hover:translate-x-1 transition-all">
+                Learn More
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+              </span>
             </div>
           </a>
         </div>
