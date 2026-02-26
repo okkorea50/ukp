@@ -1,496 +1,443 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { auth, googleProvider } from './firebase';
+import { signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
 
-// Declaration for the custom element to avoid TypeScript errors
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'iconify-icon': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-        icon: string;
-        width?: string | number;
-        'stroke-width'?: string | number;
-      };
-    }
-  }
+// ─── Types ───────────────────────────────────────────────────
+interface SubMenu {
+  label: string;
+  href: string;
 }
 
+interface MenuItem {
+  label: string;
+  href: string;
+  subs: SubMenu[];
+}
+
+// ─── Menu Data ───────────────────────────────────────────────
+const MENUS: MenuItem[] = [
+  {
+    label: '소개',
+    href: '#introduce',
+    subs: [
+      { label: '국제교류처 소개', href: '#introduce' },
+      { label: '조직도', href: '#org' },
+      { label: '연혁', href: '#history' },
+    ],
+  },
+  {
+    label: '사업안내',
+    href: '#business',
+    subs: [
+      { label: '해외교류', href: '#exchange' },
+      { label: '교환학생', href: '#exchange-student' },
+      { label: '어학연수', href: '#language' },
+      { label: '글로벌 현장학습', href: '#global' },
+      { label: '유학생 입학', href: '#admission' },
+    ],
+  },
+  {
+    label: 'International Student',
+    href: '#international',
+    subs: [
+      { label: 'Admission Information', href: '#admission-info' },
+      { label: 'Notice', href: '#notice' },
+      { label: 'PR Brochure', href: '#brochure' },
+      { label: 'PR Video', href: '#pr-video' },
+    ],
+  },
+  {
+    label: '커뮤니티',
+    href: '#community',
+    subs: [
+      { label: '공지사항', href: '#notice-board' },
+      { label: '뉴스', href: '#news' },
+      { label: '포토갤러리', href: '#gallery' },
+      { label: '영상갤러리', href: '#vod' },
+      { label: '프로그램일정', href: '#program' },
+    ],
+  },
+];
+
+const QUICK_LINKS = [
+  { icon: '🌏', label: '해외교류', href: '#exchange' },
+  { icon: '🎓', label: '교환학생', href: '#exchange-student' },
+  { icon: '🏫', label: 'KIT한국어학당', href: '#korean' },
+  { icon: '📚', label: '글로벌 현장학습', href: '#global' },
+  { icon: '✈️', label: '어학연수', href: '#language' },
+  { icon: '📝', label: '유학생 입학', href: '#admission' },
+];
+
+const NOTICES = [
+  { title: '2026년 전문대학 글로벌 현장학습사업 참여학생 모집', date: '2026.01.22' },
+  { title: '2025년 글로벌 리더 육성 프로그램(일본) 공고', date: '2025.11.17' },
+  { title: '경남정보대학교 한국어학당 한국어강사 채용 공고', date: '2025.11.05' },
+  { title: '2025년 글로벌 리더 육성 프로그램(호주) 선발 결과', date: '2025.05.29' },
+];
+
+const NEWS = [
+  { title: "'외국인 유학생' 맞춤식 학습지원 프로그램 눈길", date: '2024.11.19' },
+  { title: '지역 6개 기업과 "지역정주형 유학생 취업 협약" 체결', date: '2024.10.22' },
+  { title: '유학생과 함께하는 한글날 행사', date: '2024.10.08' },
+  { title: 'STS로보테크와 유학생 취업 업무협약 체결', date: '2024.09.13' },
+];
+
+const GALLERY_PHOTOS = [
+  { src: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&q=80', caption: '베트남 수인목화빈대학 방문' },
+  { src: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&q=80', caption: '국제 교류 세미나' },
+  { src: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&q=80', caption: '가을 FUN 피크닉' },
+  { src: 'https://images.unsplash.com/photo-1564981797816-1043664bf78d?w=600&q=80', caption: '유학생 진로 탐색 세미나' },
+];
+
+// ─── App Component ───────────────────────────────────────────
 export default function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [activeMenu, setActiveMenu] = useState<number | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (e) {
+      console.error('Login failed:', e);
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
   return (
-    <div className="bg-slate-50 text-slate-600 antialiased selection:bg-indigo-900 selection:text-white font-sans">
-      {/* Navigation */}
-      <nav className="fixed w-full z-50 top-0 transition-all duration-300 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
-        <div className="flex h-20 max-w-7xl mr-auto ml-auto pr-6 pl-6 items-center justify-between">
-          {/* Logo */}
-          <a href="#" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-indigo-950 text-white flex items-center justify-center rounded-lg shadow-lg group-hover:scale-105 transition-transform duration-300">
-              <span className="font-serif text-xl font-medium tracking-tighter">G</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-serif text-lg font-semibold text-indigo-950 tracking-tight leading-none">GIET</span>
-              <span className="text-[0.65rem] uppercase tracking-widest text-slate-500 font-medium">University</span>
-            </div>
+    <div className="min-h-screen bg-white">
+      {/* ═══════════════ Top Utility Bar ═══════════════ */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-[1200px] mx-auto px-4 h-12 flex items-center justify-between">
+          {/* Left: School link */}
+          <a
+            href="#"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gray-300 text-xs text-gray-600 hover:bg-gray-50 transition"
+          >
+            <span className="w-5 h-5 rounded-full bg-[#C1121F] text-white flex items-center justify-center text-[10px] font-bold">K</span>
+            경남정보대학교 메인
           </a>
 
-          {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center gap-8">
-            <a href="#" className="text-sm font-medium text-slate-600 hover:text-indigo-900 transition-colors">학문</a>
-            <a href="#" className="hover:text-indigo-900 transition-colors text-sm font-medium text-slate-600">입학</a>
-            <a href="#" className="text-sm font-medium text-slate-600 hover:text-indigo-900 transition-colors">연구</a>
-            <a href="#" className="text-sm font-medium text-slate-600 hover:text-indigo-900 transition-colors">캠퍼스 라이프</a>
-            <a href="#" className="text-sm font-medium text-slate-600 hover:text-indigo-900 transition-colors">취업</a>
-          </div>
+          {/* Center: Logo */}
+          <a href="#" className="flex items-center gap-2">
+            <span className="text-[#003049] font-bold text-2xl tracking-tight">KIT.</span>
+            <span className="text-[#003049] font-semibold text-lg">국제교류처</span>
+          </a>
 
-          {/* Actions */}
-          <div className="flex items-center gap-4">
-            <button className="hidden md:flex text-slate-500 hover:text-indigo-900 transition-colors cursor-pointer">
-              <iconify-icon icon="solar:magnifer-linear" width="22" stroke-width="1.5"></iconify-icon>
-            </button>
-            <a href="#" className="bg-indigo-950 text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-indigo-900 hover:shadow-lg transition-all duration-300 flex items-center gap-2 group">
-              지원하기
-              <iconify-icon icon="solar:arrow-right-linear" class="group-hover:translate-x-1 transition-transform" stroke-width="1.5"></iconify-icon>
+          {/* Right: Login & Info */}
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            {user ? (
+              <div className="flex items-center gap-3">
+                <img
+                  src={user.photoURL || ''}
+                  alt=""
+                  className="w-7 h-7 rounded-full border border-gray-200"
+                />
+                <span className="text-xs text-gray-700 hidden sm:inline">{user.displayName}</span>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1 hover:text-[#C1121F] transition cursor-pointer"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M18 12H9m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  로그아웃
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleLogin}
+                className="flex items-center gap-1 hover:text-[#003049] transition cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
+                </svg>
+                로그인
+              </button>
+            )}
+            <a href="#" className="flex items-center gap-1 hover:text-[#003049] transition">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+              입학정보
             </a>
-            <button className="lg:hidden text-slate-800 cursor-pointer">
-              <iconify-icon icon="solar:hamburger-menu-linear" width="24" stroke-width="1.5"></iconify-icon>
-            </button>
           </div>
         </div>
+      </div>
+
+      {/* ═══════════════ Table Navigation Menu ═══════════════ */}
+      <nav className={`sticky top-0 z-50 transition-shadow ${scrolled ? 'shadow-md' : ''}`}>
+        {/* Desktop Menu */}
+        <div className="hidden md:block bg-white border-b border-gray-200">
+          <div className="max-w-[1200px] mx-auto">
+            <div
+              className="grid grid-cols-4"
+              onMouseLeave={() => setActiveMenu(null)}
+            >
+              {MENUS.map((menu, i) => (
+                <div
+                  key={i}
+                  className="relative"
+                  onMouseEnter={() => setActiveMenu(i)}
+                >
+                  <a
+                    href={menu.href}
+                    className={`block text-center py-5 text-[15px] font-medium border-r border-gray-100 last:border-0 transition-all
+                      ${activeMenu === i
+                        ? 'bg-[#003049] text-white'
+                        : 'text-gray-700 hover:text-[#003049]'
+                      }`}
+                  >
+                    {menu.label}
+                  </a>
+
+                  {/* Dropdown */}
+                  {activeMenu === i && (
+                    <div className="absolute top-full left-0 w-full bg-white border border-t-0 border-gray-200 shadow-lg z-50">
+                      {menu.subs.map((sub, j) => (
+                        <a
+                          key={j}
+                          href={sub.href}
+                          className="block px-6 py-3 text-sm text-gray-600 hover:bg-[#FDF0D5] hover:text-[#780000] transition-colors border-b border-gray-50 last:border-0"
+                        >
+                          {sub.label}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Hamburger */}
+        <div className="md:hidden bg-[#003049] px-4 h-14 flex items-center justify-between">
+          <span className="text-white font-semibold">메뉴</span>
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="text-white cursor-pointer"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
+
+        {/* Mobile Menu Panel */}
+        {mobileOpen && (
+          <div className="md:hidden bg-white border-b border-gray-200 shadow-lg max-h-[70vh] overflow-y-auto">
+            {MENUS.map((menu, i) => (
+              <div key={i} className="border-b border-gray-100">
+                <button
+                  onClick={() => setActiveMenu(activeMenu === i ? null : i)}
+                  className="w-full flex items-center justify-between px-5 py-4 text-sm font-medium text-gray-700 cursor-pointer"
+                >
+                  {menu.label}
+                  <svg className={`w-4 h-4 transition-transform ${activeMenu === i ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {activeMenu === i && (
+                  <div className="bg-gray-50">
+                    {menu.subs.map((sub, j) => (
+                      <a key={j} href={sub.href} className="block px-8 py-3 text-sm text-gray-600 hover:text-[#C1121F]">
+                        {sub.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </nav>
 
-      {/* Hero Section */}
-      <header className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img src="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2886&auto=format&fit=crop" alt="Campus Architecture" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-indigo-950/80 mix-blend-multiply"></div>
-          <div className="bg-gradient-to-t from-indigo-950 via-transparent to-transparent absolute top-0 right-0 bottom-0 left-0"></div>
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center w-full mt-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-amber-300 text-xs font-medium uppercase tracking-wider mb-6 animate-fade-in-up">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-            2024-25 신입생 모집 중
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-medium text-white tracking-tight leading-tight mb-6 font-serif">
-            혁신가를 빚다. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 italic font-serif">미래를 힘 있게.</span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-            인도 중심부에서 학문적 우수성, 최첨단 연구, 글로벌 리더십 기술을 육성하는 최고의 기관입니다.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#" className="w-full sm:w-auto px-8 py-4 bg-white text-indigo-950 rounded-full font-medium text-sm hover:bg-slate-100 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5 flex items-center justify-center gap-2">
-              프로그램 살펴보기
-            </a>
-            <a href="#" className="w-full sm:w-auto px-8 py-4 bg-transparent border border-white/30 text-white rounded-full font-medium text-sm hover:bg-white/10 backdrop-blur-sm transition-all flex items-center justify-center gap-2 group">
-              <iconify-icon icon="solar:play-circle-linear" width="20" stroke-width="1.5"></iconify-icon>
-              가상 투어
-            </a>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/50 flex flex-col items-center gap-2 animate-bounce">
-          <span className="text-[10px] uppercase tracking-widest">Scroll</span>
-          <iconify-icon icon="solar:mouse-minimalistic-linear" width="20" stroke-width="1.5"></iconify-icon>
-        </div>
-      </header>
-
-      {/* Key Statistics / Trust Bar */}
-      <section className="bg-white border-b border-slate-100 relative z-20 -mt-8 mx-4 md:mx-auto max-w-6xl rounded-2xl shadow-xl p-8 md:p-12 grid grid-cols-2 md:grid-cols-4 gap-8">
-        <div className="text-center md:text-left border-r border-slate-100 last:border-0">
-          <h3 className="text-3xl md:text-4xl font-serif font-medium text-indigo-950 mb-1">96%</h3>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">취업률</p>
-        </div>
-        <div className="text-center md:text-left border-r border-slate-100 last:border-0">
-          <h3 className="text-3xl md:text-4xl font-serif font-medium text-indigo-950 mb-1">50+</h3>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">특허 출원</p>
-        </div>
-        <div className="text-center md:text-left border-r border-slate-100 last:border-0">
-          <h3 className="text-3xl md:text-4xl font-serif font-medium text-indigo-950 mb-1">25Cr</h3>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">연구 지원금</p>
-        </div>
-        <div className="text-center md:text-left">
-          <h3 className="text-3xl md:text-4xl font-serif font-medium text-indigo-950 mb-1">100+</h3>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">기업 파트너</p>
-        </div>
-      </section>
-
-      {/* Academics Section */}
-      <section className="py-24 px-6 bg-slate-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div>
-              <span className="text-amber-600 text-xs font-bold tracking-widest uppercase mb-2 block">학문</span>
-              <h2 className="text-3xl md:text-4xl font-serif font-medium text-slate-900 tracking-tight">우수 학부</h2>
-              <p className="mt-4 text-slate-500 max-w-md font-light">다양한 분야에서 차세대 리더를 양성하기 위한 맞춤형 융합 학습을 제공합니다.</p>
-            </div>
-            <a href="#" className="text-indigo-900 text-sm font-medium hover:text-amber-600 transition-colors flex items-center gap-1 group">
-              모든 프로그램 보기 
-              <iconify-icon icon="solar:arrow-right-linear" class="group-hover:translate-x-1 transition-transform" stroke-width="1.5"></iconify-icon>
-            </a>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Card 1 */}
-            <a href="#" className="group bg-white p-8 rounded-xl border border-slate-200 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-900/5 transition-all duration-300 relative overflow-hidden">
-              <div className="w-12 h-12 bg-indigo-50 text-indigo-900 rounded-lg flex items-center justify-center mb-6 group-hover:bg-indigo-900 group-hover:text-white transition-colors">
-                <iconify-icon icon="solar:monitor-smartphone-linear" width="24" stroke-width="1.5"></iconify-icon>
-              </div>
-              <h3 className="text-xl font-serif font-medium text-slate-900 mb-3 group-hover:text-indigo-900 transition-colors">공학 및 기술</h3>
-              <p className="text-sm text-slate-500 leading-relaxed mb-6">컴퓨터 과학, AI & ML, 토목, 기계 및 전자 공학.</p>
-              <span className="inline-flex items-center text-xs font-medium text-indigo-900 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                강의 계획서 보기 <iconify-icon icon="solar:arrow-right-linear" class="ml-1"></iconify-icon>
-              </span>
-            </a>
-
-            {/* Card 2 */}
-            <a href="#" className="group bg-white p-8 rounded-xl border border-slate-200 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-900/5 transition-all duration-300 relative overflow-hidden">
-              <div className="w-12 h-12 bg-indigo-50 text-indigo-900 rounded-lg flex items-center justify-center mb-6 group-hover:bg-indigo-900 group-hover:text-white transition-colors">
-                <iconify-icon icon="solar:graph-up-linear" width="24" stroke-width="1.5"></iconify-icon>
-              </div>
-              <h3 className="text-xl font-serif font-medium text-slate-900 mb-3 group-hover:text-indigo-900 transition-colors">경영학</h3>
-              <p className="text-sm text-slate-500 leading-relaxed mb-6">MBA, BBA, 그리고 재무, 마케팅, HR 전문 프로그램.</p>
-              <span className="inline-flex items-center text-xs font-medium text-indigo-900 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                강의 계획서 보기 <iconify-icon icon="solar:arrow-right-linear" class="ml-1"></iconify-icon>
-              </span>
-            </a>
-
-            {/* Card 3 */}
-            <a href="#" className="group bg-white p-8 rounded-xl border border-slate-200 hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-900/5 transition-all duration-300 relative overflow-hidden">
-              <div className="w-12 h-12 bg-indigo-50 text-indigo-900 rounded-lg flex items-center justify-center mb-6 group-hover:bg-indigo-900 group-hover:text-white transition-colors">
-                <iconify-icon icon="solar:test-tube-minimalistic-linear" width="24" stroke-width="1.5"></iconify-icon>
-              </div>
-              <h3 className="text-xl font-serif font-medium text-slate-900 mb-3 group-hover:text-indigo-900 transition-colors">농업 및 과학</h3>
-              <p className="text-sm text-slate-500 leading-relaxed mb-6">첨단 농업 관행, 생명 공학 및 순수 과학.</p>
-              <span className="inline-flex items-center text-xs font-medium text-indigo-900 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all duration-300">
-                강의 계획서 보기 <iconify-icon icon="solar:arrow-right-linear" class="ml-1"></iconify-icon>
-              </span>
-            </a>
+      {/* ═══════════════ Hero Banner ═══════════════ */}
+      <section className="relative h-[350px] md:h-[420px] overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1600&q=80"
+          alt="Students"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent" />
+        <div className="absolute inset-0 flex items-center justify-center md:justify-end md:pr-24">
+          <div className="text-center md:text-right">
+            <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight drop-shadow-lg">
+              품어라 세계를!
+            </h1>
+            <p className="text-xl md:text-3xl text-white/90 mt-2 font-light drop-shadow-md">
+              더 큰 내일 향한 발걸음
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Research & Innovation Highlight (Dark Mode) */}
-      <section className="py-24 bg-indigo-950 text-white relative overflow-hidden">
-        {/* Decoration */}
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-indigo-900/50 to-transparent"></div>
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="h-px w-8 bg-amber-500"></span>
-                <span className="text-amber-500 text-xs font-bold tracking-widest uppercase">연구 및 혁신</span>
-              </div>
-              <h2 className="text-3xl md:text-5xl font-serif font-medium tracking-tight mb-6 leading-tight">
-                <span className="italic text-slate-300">발견</span>을 통해 미래를 개척합니다.
-              </h2>
-              <p className="text-indigo-200 text-lg font-light mb-8 max-w-lg">
-                15개 이상의 첨단 연구 센터가 재생 에너지부터 AI 윤리까지 글로벌 과제를 해결하고 있습니다. 호기심이 영향력을 만나는 커뮤니티에 참여하세요.
+      {/* ═══════════════ Quick Links Grid ═══════════════ */}
+      <section className="max-w-[1200px] mx-auto px-4 -mt-8 relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-0 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
+          {QUICK_LINKS.map((link, i) => (
+            <a
+              key={i}
+              href={link.href}
+              className="flex items-center gap-3 px-6 py-5 border-r border-b border-gray-100 last:border-r-0 hover:bg-[#FDF0D5] transition-colors group"
+            >
+              <span className="text-2xl">{link.icon}</span>
+              <span className="text-sm font-medium text-gray-700 group-hover:text-[#780000] transition-colors">
+                {link.label}
+              </span>
+            </a>
+          ))}
+          {/* CTA Card */}
+          <a
+            href="#admission-info"
+            className="col-span-2 md:col-span-1 md:row-span-2 bg-[#780000] text-white flex items-center justify-center p-8 hover:bg-[#9A0000] transition-colors group"
+          >
+            <div className="text-center">
+              <svg className="w-10 h-10 mx-auto mb-3 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+              </svg>
+              <p className="text-sm font-semibold leading-relaxed">
+                Admission information<br />for international students
               </p>
-              
-              <ul className="space-y-4 mb-10">
-                <li className="flex items-start gap-3">
-                  <iconify-icon icon="solar:check-circle-linear" class="text-amber-500 mt-1" width="20"></iconify-icon>
-                  <span className="text-sm text-slate-200">스타트업을 위한 최첨단 인큐베이션 센터</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <iconify-icon icon="solar:check-circle-linear" class="text-amber-500 mt-1" width="20"></iconify-icon>
-                  <span className="text-sm text-slate-200">DRDO 및 ISRO와의 협력 프로젝트</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <iconify-icon icon="solar:check-circle-linear" class="text-amber-500 mt-1" width="20"></iconify-icon>
-                  <span className="text-sm text-slate-200">우수 학자를 위한 전용 박사 펠로우십</span>
-                </li>
-              </ul>
-
-              <a href="#" className="inline-flex items-center gap-2 text-white border-b border-amber-500 pb-1 hover:text-amber-400 transition-colors">
-                연구 생태계 살펴보기
-                <iconify-icon icon="solar:arrow-right-linear" stroke-width="1.5"></iconify-icon>
-              </a>
+              <span className="inline-block mt-2 text-xs opacity-70 group-hover:opacity-100 transition">→ 자세히 보기</span>
             </div>
+          </a>
+        </div>
+      </section>
 
-            <div className="relative group">
-              <div className="absolute -inset-2 bg-gradient-to-r from-amber-500 to-indigo-600 rounded-2xl opacity-20 blur-lg group-hover:opacity-40 transition duration-500"></div>
-              <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=2940&auto=format&fit=crop" alt="Lab Research" className="relative rounded-2xl shadow-2xl w-full object-cover h-[500px] grayscale group-hover:grayscale-0 transition duration-700" />
-              
-              <div className="absolute bottom-6 left-6 right-6 bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/10">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-amber-300 uppercase tracking-widest mb-1">최신 혁신</p>
-                    <p className="text-white font-medium">지속 가능한 에너지 저장 솔루션</p>
-                  </div>
-                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-indigo-950">
-                    <iconify-icon icon="solar:arrow-right-up-linear" width="20"></iconify-icon>
-                  </div>
-                </div>
+      {/* ═══════════════ Photo Gallery ═══════════════ */}
+      <section className="mt-16 bg-gray-800 py-12">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
+            {GALLERY_PHOTOS.map((photo, i) => (
+              <div key={i} className="relative group overflow-hidden aspect-[4/3]">
+                <img
+                  src={photo.src}
+                  alt={photo.caption}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <p className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs px-4 py-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  {photo.caption}
+                </p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Placements & Connect */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-indigo-600 text-xs font-bold tracking-widest uppercase mb-2 block">취업 성과</span>
-            <h2 className="text-3xl md:text-4xl font-serif font-medium text-slate-900 tracking-tight">캠퍼스에서 기업으로</h2>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-8 mb-16">
-            {/* Highlight Box */}
-            <div className="col-span-1 bg-slate-50 border border-slate-100 p-8 rounded-2xl flex flex-col justify-center text-center">
-              <div className="inline-block mx-auto mb-4 p-3 bg-amber-100 rounded-full text-amber-600">
-                <iconify-icon icon="solar:crown-star-linear" width="32" stroke-width="1.5"></iconify-icon>
-              </div>
-              <h3 className="text-5xl font-serif font-medium text-slate-900 mb-2">₹42 LPA</h3>
-              <p className="text-sm font-medium text-slate-500 uppercase tracking-wide">최고 연봉 제안</p>
-            </div>
-
-            {/* Recruiters Grid */}
-            <div className="col-span-1 lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
-               {/* Recruiter Logos (Using text representation for style matching without external SVG assets issues) */}
-               <div className="flex items-center justify-center p-6 border border-slate-100 rounded-xl hover:shadow-md transition bg-white grayscale hover:grayscale-0 opacity-70 hover:opacity-100">
-                <span className="font-sans font-bold text-lg tracking-tight text-blue-600">Google</span>
-               </div>
-               <div className="flex items-center justify-center p-6 border border-slate-100 rounded-xl hover:shadow-md transition bg-white grayscale hover:grayscale-0 opacity-70 hover:opacity-100">
-                <span className="font-serif font-bold text-lg tracking-tight text-slate-900">Amazon</span>
-               </div>
-               <div className="flex items-center justify-center p-6 border border-slate-100 rounded-xl hover:shadow-md transition bg-white grayscale hover:grayscale-0 opacity-70 hover:opacity-100">
-                <span className="font-sans font-bold text-lg tracking-tight text-blue-800">TCS</span>
-               </div>
-               <div className="flex items-center justify-center p-6 border border-slate-100 rounded-xl hover:shadow-md transition bg-white grayscale hover:grayscale-0 opacity-70 hover:opacity-100">
-                <span className="font-sans font-bold text-lg tracking-tight text-indigo-600">Infosys</span>
-               </div>
-               <div className="flex items-center justify-center p-6 border border-slate-100 rounded-xl hover:shadow-md transition bg-white grayscale hover:grayscale-0 opacity-70 hover:opacity-100">
-                <span className="font-sans font-bold text-lg tracking-tight text-orange-600">Wipro</span>
-               </div>
-               <div className="flex items-center justify-center p-6 border border-slate-100 rounded-xl hover:shadow-md transition bg-white grayscale hover:grayscale-0 opacity-70 hover:opacity-100">
-                <span className="font-sans font-bold text-lg tracking-tight text-blue-500">Capgemini</span>
-               </div>
-               <div className="flex items-center justify-center p-6 border border-slate-100 rounded-xl hover:shadow-md transition bg-white grayscale hover:grayscale-0 opacity-70 hover:opacity-100">
-                <span className="font-sans font-bold text-lg tracking-tight text-red-600">Accenture</span>
-               </div>
-               <div className="flex items-center justify-center p-6 border border-slate-100 rounded-xl hover:shadow-md transition bg-white grayscale hover:grayscale-0 opacity-70 hover:opacity-100">
-                <span className="font-sans font-bold text-lg tracking-tight text-emerald-600">Deloitte</span>
-               </div>
-            </div>
-          </div>
-          
-          <div className="text-center">
-            <a href="#" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 border border-slate-200 px-6 py-3 rounded-full hover:bg-slate-50 transition">
-              2024년 취업 보고서 보기
-              <iconify-icon icon="solar:file-download-linear" width="18"></iconify-icon>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Campus Life Gallery */}
-      <section className="py-24 px-6 bg-slate-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-10">
-            <h2 className="text-3xl font-serif font-medium text-slate-900 tracking-tight">GIET에서의 생활</h2>
-            <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-white hover:shadow-md transition text-slate-600 cursor-pointer">
-                <iconify-icon icon="solar:arrow-left-linear" width="20"></iconify-icon>
-              </button>
-              <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-white hover:shadow-md transition text-slate-600 cursor-pointer">
-                <iconify-icon icon="solar:arrow-right-linear" width="20"></iconify-icon>
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-[600px]">
-            <div className="md:col-span-2 md:row-span-2 relative group overflow-hidden rounded-2xl">
-              <img src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=2940&auto=format&fit=crop" className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Student Event" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80"></div>
-              <div className="absolute bottom-6 left-6 text-white">
-                <h3 className="text-xl font-medium mb-1">연례 문화 축제</h3>
-                <p className="text-sm text-white/80">다양성과 재능을 기념합니다.</p>
-              </div>
-            </div>
-            <div className="md:col-span-1 md:row-span-1 relative group overflow-hidden rounded-2xl">
-              <img src="https://images.unsplash.com/photo-1531545514256-b1400bc00f31?q=80&w=2874&auto=format&fit=crop" className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Library" />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition"></div>
-              <div className="absolute bottom-4 left-4 text-white translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-300">
-                <p className="text-sm font-medium">중앙 도서관</p>
-              </div>
-            </div>
-            <div className="md:col-span-1 md:row-span-1 relative group overflow-hidden rounded-2xl">
-              <img src="https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/917d6f93-fb36-439a-8c48-884b67b35381_1600w.jpg" className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Sports" />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition"></div>
-              <div className="absolute bottom-4 left-4 text-white translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-300">
-                <p className="text-sm font-medium">스포츠 단지</p>
-              </div>
-            </div>
-            <div className="md:col-span-2 md:row-span-1 relative group overflow-hidden rounded-2xl">
-              <img src="https://images.unsplash.com/photo-1564981797816-1043664bf78d?q=80&w=2874&auto=format&fit=crop" className="w-full h-full object-cover transition duration-700 group-hover:scale-110" alt="Tech Lab" />
-               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80"></div>
-              <div className="absolute bottom-6 left-6 text-white">
-                <h3 className="text-lg font-medium mb-1">혁신 허브</h3>
-                <p className="text-sm text-white/80">아이디어가 현실이 되는 곳.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* News & Happenings */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-           <div className="flex justify-between items-end mb-12 border-b border-slate-100 pb-4">
-            <h2 className="text-3xl font-serif font-medium text-slate-900 tracking-tight">대학 소식</h2>
-            <a href="#" className="text-indigo-600 text-sm font-medium hover:text-indigo-800">아카이브 보기</a>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* News Item 1 */}
-            <article className="group cursor-pointer">
-              <div className="aspect-[4/3] rounded-xl overflow-hidden mb-4">
-                <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2940&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Convocation" />
-              </div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-[10px] uppercase font-bold tracking-widest text-indigo-600">행사</span>
-                <span className="text-xs text-slate-400">2023년 10월 24일</span>
-              </div>
-              <h3 className="text-lg font-medium text-slate-900 group-hover:text-indigo-800 transition-colors leading-snug mb-2">
-                제25회 학위수여식: 학문적 우수성을 기념하며
-              </h3>
-              <p className="text-sm text-slate-500 line-clamp-2">K. Sivan 박사를 주빈으로 모시고 1,200명 학생들의 졸업을 축하했습니다.</p>
-            </article>
-
-            {/* News Item 2 */}
-            <article className="group cursor-pointer">
-              <div className="aspect-[4/3] rounded-xl overflow-hidden mb-4">
-                <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2940&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="Workshop" />
-              </div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-600">학술</span>
-                <span className="text-xs text-slate-400">2023년 10월 18일</span>
-              </div>
-              <h3 className="text-lg font-medium text-slate-900 group-hover:text-indigo-800 transition-colors leading-snug mb-2">
-                지속 가능한 발전을 위한 국제 컨퍼런스
-              </h3>
-              <p className="text-sm text-slate-500 line-clamp-2">15개국 대표단이 모여 미래 지속 가능성 목표를 논의했습니다.</p>
-            </article>
-
-            {/* Notice Board Style */}
-            <div className="bg-slate-50 border border-slate-100 rounded-xl p-6">
-              <h3 className="font-serif text-xl text-indigo-950 mb-6 flex items-center gap-2">
-                <iconify-icon icon="solar:bell-bing-linear" class="text-amber-500"></iconify-icon>
-                최신 공지
-              </h3>
-              <ul className="space-y-4">
-                <li className="pb-4 border-b border-slate-200 last:border-0">
-                  <a href="#" className="block group">
-                    <span className="text-[10px] text-slate-400 font-medium">11월 01일</span>
-                    <p className="text-sm text-slate-700 font-medium group-hover:text-indigo-600 transition">가을 학기 시험 일정 발표</p>
-                  </a>
-                </li>
-                <li className="pb-4 border-b border-slate-200 last:border-0">
-                  <a href="#" className="block group">
-                    <span className="text-[10px] text-slate-400 font-medium">10월 28일</span>
-                    <p className="text-sm text-slate-700 font-medium group-hover:text-indigo-600 transition">2024년 박사 과정 모집</p>
-                  </a>
-                </li>
-                <li className="pb-4 last:border-0">
-                  <a href="#" className="block group">
-                    <span className="text-[10px] text-slate-400 font-medium">10월 25일</span>
-                    <p className="text-sm text-slate-700 font-medium group-hover:text-indigo-600 transition">동계 인턴십 모집: 등록</p>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-indigo-950 text-slate-300 pt-20 pb-10 border-t border-indigo-900">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-16">
-            {/* Brand */}
-            <div className="lg:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 bg-white text-indigo-950 flex items-center justify-center rounded shadow-lg">
-                  <span className="font-serif text-lg font-bold">G</span>
-                </div>
-                <span className="font-serif text-xl text-white tracking-tight">GIET University</span>
-              </div>
-              <p className="text-sm leading-relaxed text-indigo-200/80 mb-6 pr-8">
-                Gunupur, Odisha, India - 765022.<br />
-                국가와 세계에 봉사할 수 있는 지식, 기술, 가치를 갖춘 학생들을 양성합니다.
-              </p>
-              <div className="flex gap-x-4 gap-y-4">
-                <a href="#" className="w-8 h-8 rounded-full bg-indigo-900 flex items-center justify-center text-white hover:bg-amber-500 transition-colors">
-                  <iconify-icon icon="solar:facebook-linear" width="16"></iconify-icon>
-                </a>
-                <a href="#" className="w-8 h-8 rounded-full bg-indigo-900 flex items-center justify-center text-white hover:bg-amber-500 transition-colors">
-                  <iconify-icon icon="solar:twitter-linear" width="16"></iconify-icon>
-                </a>
-                <a href="#" className="w-8 h-8 rounded-full bg-indigo-900 flex items-center justify-center text-white hover:bg-amber-500 transition-colors">
-                  <iconify-icon icon="solar:instagram-linear" width="16"></iconify-icon>
-                </a>
-                <a href="#" className="w-8 h-8 rounded-full bg-indigo-900 flex items-center justify-center text-white hover:bg-amber-500 transition-colors">
-                  <iconify-icon icon="solar:linkedin-linear" width="16"></iconify-icon>
-                </a>
-              </div>
-            </div>
-
-            {/* Links */}
+      {/* ═══════════════ News & Notices ═══════════════ */}
+      <section className="py-16 bg-[#FDF0D5]/30">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-10">
+            {/* 공지사항 */}
             <div>
-              <h4 className="text-white font-medium mb-6 text-sm uppercase tracking-wider">학문</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-amber-400 transition-colors">프로그램</a></li>
-                <li><a href="#" className="hover:text-amber-400 transition-colors">학과</a></li>
-                <li><a href="#" className="hover:text-amber-400 transition-colors">학사 일정</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-medium mb-6 text-sm uppercase tracking-wider">입학</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-amber-400 transition-colors">지원 방법</a></li>
-                <li><a href="#" className="hover:text-amber-400 transition-colors">장학금</a></li>
-                <li><a href="#" className="hover:text-amber-400 transition-colors">등록금</a></li>
-              </ul>
-            </div>
-
-            {/* Newsletter */}
-            <div className="lg:col-span-2">
-              <h4 className="text-white font-medium mb-6 text-sm uppercase tracking-wider">소식 받기</h4>
-              <p className="text-xs text-indigo-200 mb-4">최신 소식을 받아보시려면 뉴스레터를 구독하세요.</p>
-              <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-                <input type="email" placeholder="이메일 주소" className="bg-indigo-900/50 border border-indigo-800 rounded-lg px-4 py-2 text-sm text-white w-full focus:outline-none focus:border-amber-500 transition-colors placeholder-indigo-400" />
-                <button className="bg-amber-500 text-indigo-950 px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-400 transition-colors">
-                  구독
-                </button>
-              </form>
-              <div className="mt-8 flex gap-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                {/* Accreditation Placeholders */}
-                <div className="h-8 border border-white/30 rounded px-2 flex items-center text-xs font-bold text-white">NAAC 'A+'</div>
-                <div className="h-8 border border-white/30 rounded px-2 flex items-center text-xs font-bold text-white">NBA</div>
-                <div className="h-8 border border-white/30 rounded px-2 flex items-center text-xs font-bold text-white">UGC</div>
+              <div className="flex items-center justify-between mb-6 border-b-2 border-[#003049] pb-3">
+                <h2 className="text-xl font-bold text-[#003049]">공지사항</h2>
+                <a href="#notice-board" className="text-gray-400 hover:text-[#C1121F] transition">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </a>
               </div>
+              {/* Featured */}
+              <div className="mb-4">
+                <h3 className="text-base font-semibold text-gray-800 mb-1 hover:text-[#C1121F] cursor-pointer transition">
+                  {NOTICES[0].title}
+                </h3>
+                <p className="text-xs text-gray-400">{NOTICES[0].date}</p>
+              </div>
+              {/* List */}
+              <ul className="space-y-3">
+                {NOTICES.slice(1).map((n, i) => (
+                  <li key={i} className="flex items-center justify-between text-sm group cursor-pointer">
+                    <span className="text-gray-600 group-hover:text-[#C1121F] transition truncate pr-4">
+                      · {n.title}
+                    </span>
+                    <span className="text-xs text-gray-400 whitespace-nowrap">{n.date}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* 센터뉴스 */}
+            <div>
+              <div className="flex items-center justify-between mb-6 border-b-2 border-[#003049] pb-3">
+                <h2 className="text-xl font-bold text-[#003049]">센터뉴스 · News</h2>
+                <a href="#news" className="text-gray-400 hover:text-[#C1121F] transition">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </a>
+              </div>
+              <div className="mb-4">
+                <h3 className="text-base font-semibold text-gray-800 mb-1 hover:text-[#C1121F] cursor-pointer transition">
+                  {NEWS[0].title}
+                </h3>
+                <p className="text-xs text-gray-400">{NEWS[0].date}</p>
+              </div>
+              <ul className="space-y-3">
+                {NEWS.slice(1).map((n, i) => (
+                  <li key={i} className="flex items-center justify-between text-sm group cursor-pointer">
+                    <span className="text-gray-600 group-hover:text-[#C1121F] transition truncate pr-4">
+                      · {n.title}
+                    </span>
+                    <span className="text-xs text-gray-400 whitespace-nowrap">{n.date}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════ Footer ═══════════════ */}
+      <footer className="bg-[#003049] text-gray-300 pt-10 pb-6">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-6">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white rounded flex items-center justify-center">
+                <span className="text-[#003049] font-bold text-xl">KIT.</span>
+              </div>
+              <div>
+                <p className="text-white font-semibold text-sm">경남정보대학교</p>
+                <p className="text-xs text-gray-400">Kyungnam College of Information & Technology</p>
+              </div>
+            </div>
+
+            {/* Quick Footer Links */}
+            <div className="flex flex-wrap gap-4 text-xs">
+              <a href="#" className="hover:text-white transition">캠퍼스맵</a>
+              <a href="#" className="text-[#C1121F] font-semibold hover:text-white transition">개인정보처리방침</a>
+              <a href="#" className="hover:text-white transition">개인정보공시</a>
+              <a href="#" className="hover:text-white transition">영상정보처리기기 운영 · 관리 방침</a>
             </div>
           </div>
 
-          <div className="border-t border-indigo-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-indigo-300">
-            <p>© 2024 GIET University. All rights reserved.</p>
-            <div className="flex gap-6 mt-4 md:mt-0">
-              <a href="#" className="hover:text-white">개인정보 처리방침</a>
-              <a href="#" className="hover:text-white">이용약관</a>
-              <a href="#" className="hover:text-white">사이트맵</a>
-            </div>
+          <div className="border-t border-white/10 pt-4 text-xs text-gray-500 flex flex-col md:flex-row justify-between gap-2">
+            <p>(우) 47011 부산광역시 사상구 주례로 45 경남정보대학교 미래관 1층 국제교류처 TEL (051) 320-1480 FAX (051) 328-9551</p>
+            <p>Copyright (c) 2019 Kyungnam College of Information & Technology. All Rights Reserved</p>
           </div>
         </div>
       </footer>

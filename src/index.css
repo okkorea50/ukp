@@ -1,46 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  
-  --animate-fade-in-up: fadeInUp 0.5s ease-out forwards;
+  --color-main: #003049;
+  --color-secondary: #780000;
+  --color-warm: #FDF0D5;
+  --color-accent: #C1121F;
+  --color-main-light: #004060;
+  --color-secondary-light: #9A0000;
+  --color-accent-light: #E0151F;
+}
 
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+@layer base {
+  body {
+    font-family: 'Inter', 'Noto Sans KR', sans-serif;
+    color: #333;
+    background: #fff;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  * {
+    box-sizing: border-box;
   }
 }
 
-/* Custom scrollbar for a premium feel */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f1f1f1;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #003049;
+  border-radius: 3px;
 }
 
-.text-gradient {
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Dropdown animation */
+.dropdown-enter {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
-/* Ensure iconify-icon behaves correctly */
-iconify-icon {
-  display: inline-block;
-  vertical-align: middle;
+.dropdown-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.2s, transform 0.2s;
 }
