@@ -62,7 +62,7 @@ const MENUS: MenuItem[] = [
 const QUICK_LINKS = [
   { icon: '🌏', label: '해외교류', href: '#exchange' },
   { icon: '🎓', label: '교환학생', href: '#exchange-student' },
-  { icon: '🏫', label: 'KIT한국어학당', href: '#korean' },
+  { icon: '🏫', label: 'UKP 한국어학당', href: '#korean' },
   { icon: '📚', label: '글로벌 현장학습', href: '#global' },
   { icon: '✈️', label: '어학연수', href: '#language' },
   { icon: '📝', label: '유학생 입학', href: '#admission' },
@@ -71,7 +71,7 @@ const QUICK_LINKS = [
 const NOTICES = [
   { title: '2026년 전문대학 글로벌 현장학습사업 참여학생 모집', date: '2026.01.22' },
   { title: '2025년 글로벌 리더 육성 프로그램(일본) 공고', date: '2025.11.17' },
-  { title: '경남정보대학교 한국어학당 한국어강사 채용 공고', date: '2025.11.05' },
+  { title: '김포대학교 한국어학당 한국어강사 채용 공고', date: '2025.11.05' },
   { title: '2025년 글로벌 리더 육성 프로그램(호주) 선발 결과', date: '2025.05.29' },
 ];
 
@@ -126,17 +126,17 @@ export default function App() {
         <div className="max-w-[1200px] mx-auto px-4 h-12 flex items-center justify-between">
           {/* Left: School link */}
           <a
-            href="#"
+            href="https://ukp.ac.kr/home"
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gray-300 text-xs text-gray-600 hover:bg-gray-50 transition"
           >
-            <span className="w-5 h-5 rounded-full bg-[#C1121F] text-white flex items-center justify-center text-[10px] font-bold">K</span>
-            경남정보대학교 메인
+            <span className="w-5 h-5 rounded-full bg-[#822433] text-white flex items-center justify-center text-[10px] font-bold">K</span>
+            김포대학교 메인
           </a>
 
           {/* Center: Logo */}
           <a href="#" className="flex items-center gap-2">
-            <span className="text-[#003049] font-bold text-2xl tracking-tight">KIT.</span>
-            <span className="text-[#003049] font-semibold text-lg">국제교류처</span>
+            <span className="text-[#003049] font-bold text-2xl tracking-tight">UKP</span>
+            <span className="text-[#003049] font-semibold text-lg">융합전공학부 통합지원</span>
           </a>
 
           {/* Right: Login & Info */}
@@ -199,8 +199,8 @@ export default function App() {
                     href={menu.href}
                     className={`block text-center py-5 text-[15px] font-medium border-r border-gray-100 last:border-0 transition-all
                       ${activeMenu === i
-                        ? 'bg-[#003049] text-white'
-                        : 'text-gray-700 hover:text-[#003049]'
+                        ? 'bg-[#822433] text-white'
+                        : 'text-gray-700 hover:text-[#822433]'
                       }`}
                   >
                     {menu.label}
@@ -213,7 +213,7 @@ export default function App() {
                         <a
                           key={j}
                           href={sub.href}
-                          className="block px-6 py-3 text-sm text-gray-600 hover:bg-[#FDF0D5] hover:text-[#780000] transition-colors border-b border-gray-50 last:border-0"
+                          className="block px-6 py-3 text-sm text-gray-600 hover:bg-[#FDF0D5] hover:text-[#822433] transition-colors border-b border-gray-50 last:border-0"
                         >
                           {sub.label}
                         </a>
@@ -418,11 +418,11 @@ export default function App() {
             {/* Logo */}
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white rounded flex items-center justify-center">
-                <span className="text-[#003049] font-bold text-xl">KIT.</span>
+                <span className="text-[#003049] font-bold text-xl">UKP</span>
               </div>
               <div>
-                <p className="text-white font-semibold text-sm">경남정보대학교</p>
-                <p className="text-xs text-gray-400">Kyungnam College of Information & Technology</p>
+                <p className="text-white font-semibold text-sm">김포대학교</p>
+                <p className="text-xs text-gray-400">Gimpo University</p>
               </div>
             </div>
 
@@ -436,8 +436,8 @@ export default function App() {
           </div>
 
           <div className="border-t border-white/10 pt-4 text-xs text-gray-500 flex flex-col md:flex-row justify-between gap-2">
-            <p>(우) 47011 부산광역시 사상구 주례로 45 경남정보대학교 미래관 1층 국제교류처 TEL (051) 320-1480 FAX (051) 328-9551</p>
-            <p>Copyright (c) 2019 Kyungnam College of Information & Technology. All Rights Reserved</p>
+            <p>(우) 10040 경기도 김포시 월곶면 김포대학로 97 김포대학교 융합전공학부 TEL (031) 999-4000 FAX (031) 999-4001</p>
+            <p>Copyright (c) 2026 Gimpo University. All Rights Reserved</p>
           </div>
         </div>
       </footer>
