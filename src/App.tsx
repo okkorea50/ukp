@@ -129,14 +129,14 @@ export default function App() {
             href="https://ukp.ac.kr/home"
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gray-300 text-xs text-gray-600 hover:bg-gray-50 transition"
           >
-            <span className="w-5 h-5 rounded-full bg-[#822433] text-white flex items-center justify-center text-[10px] font-bold">K</span>
+            <span className="w-5 h-5 rounded-full bg-hover text-white flex items-center justify-center text-[10px] font-bold">K</span>
             김포대학교 메인
           </a>
 
           {/* Center: Logo */}
-          <a href="#" className="flex items-center gap-2">
-            <span className="text-[#003049] font-bold text-2xl tracking-tight">UKP</span>
-            <span className="text-[#003049] font-semibold text-lg">융합전공학부 통합지원</span>
+          <a href="#" className="flex items-center gap-2 brand-font">
+            <span className="text-ukp font-bold text-2xl tracking-tight">UKP</span>
+            <span className="text-black font-semibold text-lg">융합전공학부 통합지원</span>
           </a>
 
           {/* Right: Login & Info */}
@@ -199,8 +199,8 @@ export default function App() {
                     href={menu.href}
                     className={`block text-center py-5 text-[15px] font-medium border-r border-gray-100 last:border-0 transition-all
                       ${activeMenu === i
-                        ? 'bg-[#822433] text-white'
-                        : 'text-gray-700 hover:text-[#822433]'
+                        ? 'bg-hover text-white'
+                        : 'text-gray-700 hover:text-hover'
                       }`}
                   >
                     {menu.label}
@@ -213,7 +213,7 @@ export default function App() {
                         <a
                           key={j}
                           href={sub.href}
-                          className="block px-6 py-3 text-sm text-gray-600 hover:bg-[#FDF0D5] hover:text-[#822433] transition-colors border-b border-gray-50 last:border-0"
+                          className="block px-6 py-3 text-sm text-gray-600 hover:bg-[#FDF0D5] hover:text-hover transition-colors border-b border-gray-50 last:border-0"
                         >
                           {sub.label}
                         </a>
@@ -353,7 +353,7 @@ export default function App() {
             {/* 공지사항 */}
             <div>
               <div className="flex items-center justify-between mb-6 border-b-2 border-[#003049] pb-3">
-                <h2 className="text-xl font-bold text-[#003049]">공지사항</h2>
+                <h2 className="text-xl font-bold text-[#003049] brand-font">공지사항</h2>
                 <a href="#notice-board" className="text-gray-400 hover:text-[#C1121F] transition">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -383,7 +383,7 @@ export default function App() {
             {/* 센터뉴스 */}
             <div>
               <div className="flex items-center justify-between mb-6 border-b-2 border-[#003049] pb-3">
-                <h2 className="text-xl font-bold text-[#003049]">센터뉴스 · News</h2>
+                <h2 className="text-xl font-bold text-[#003049] brand-font">센터뉴스 · News</h2>
                 <a href="#news" className="text-gray-400 hover:text-[#C1121F] transition">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -418,7 +418,7 @@ export default function App() {
             {/* Logo */}
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white rounded flex items-center justify-center">
-                <span className="text-[#003049] font-bold text-xl">UKP</span>
+                <span className="text-[#003049] font-bold text-xl brand-font">UKP</span>
               </div>
               <div>
                 <p className="text-white font-semibold text-sm">김포대학교</p>
