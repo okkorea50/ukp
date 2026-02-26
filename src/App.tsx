@@ -308,11 +308,11 @@ export default function App() {
               </div>
               <div className="space-y-4 flex-grow">
                 <a href="#exchange" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-gray-50 transition-colors">
-                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-ukp">해외교류 프로그램</span>
+                  <span className="text-base font-medium text-gray-600 group-hover/link:text-ukp">해외교류 프로그램</span>
                   <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
                 </a>
                 <a href="#student" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-gray-50 transition-colors">
-                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-ukp">교환학생 안내</span>
+                  <span className="text-base font-medium text-gray-600 group-hover/link:text-ukp">교환학생 안내</span>
                   <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
                 </a>
               </div>
@@ -331,11 +331,11 @@ export default function App() {
               </div>
               <div className="space-y-4 flex-grow">
                 <a href="#kit-korean" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-white transition-colors">
-                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-[#003049]">UKP 한국어학당</span>
+                  <span className="text-base font-medium text-gray-600 group-hover/link:text-[#003049]">UKP 한국어학당</span>
                   <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
                 </a>
                 <a href="#training" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-white transition-colors">
-                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-[#003049]">단기 어학연수</span>
+                  <span className="text-base font-medium text-gray-600 group-hover/link:text-[#003049]">단기 어학연수</span>
                   <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
                 </a>
               </div>
@@ -354,11 +354,11 @@ export default function App() {
               </div>
               <div className="space-y-4 flex-grow">
                 <a href="#field-learning" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-white transition-colors">
-                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-orange-600">글로벌 현장학습</span>
+                  <span className="text-base font-medium text-gray-600 group-hover/link:text-orange-600">글로벌 현장학습</span>
                   <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
                 </a>
                 <a href="#admission" className="flex items-center justify-between group/link p-3 rounded-xl hover:bg-white transition-colors">
-                  <span className="text-sm font-medium text-gray-600 group-hover/link:text-orange-600">유학생 입학상담</span>
+                  <span className="text-base font-medium text-gray-600 group-hover/link:text-orange-600">유학생 입학상담</span>
                   <span className="text-gray-300 group-hover/link:translate-x-1 transition-transform">→</span>
                 </a>
               </div>
